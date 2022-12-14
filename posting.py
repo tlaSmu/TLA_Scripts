@@ -14,6 +14,7 @@ import gspread
 
 domain = "site.com"  # хост
 filename_with_posts_data = "to_posting_example.csv"  # файл с данными
+path_with_generated_files = "glue_new_html_files_layout/"  # папка с сгенерированными статьями
 serpapi_key = "xxxxxxxxxxxxxxxxxxxx"  # ключ serpapi
 publish_period = 'future'  # когда публиковать: 'future' - в будущем, 'publish' - сразу
 
@@ -226,7 +227,7 @@ for article in filenames_linking_categories:
 
         headers = {'Authorization': 'Basic ' + token.decode('utf-8')}
 
-        file = open("glue_new_html_files_layout/" + filename, "r")
+        file = open(path_with_generated_files + filename, "r")
         soup = BeautifulSoup(file, 'html.parser')
 
         post_title = soup.find_all('h1')[0].get_text().title()
