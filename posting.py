@@ -246,8 +246,10 @@ for article in filenames_linking_categories:
         for i in range(0, len(soup.find_all('h3'))):
             all_h3.append(soup.find_all('h3')[i].get_text().title())
 
-        youtube_url = youtube_search(all_h3[-1])
-
+        if all_h3 != []:
+            youtube_url = youtube_search(all_h3[-1])
+        else:
+            youtube_url = None
 
         soup.h1.extract()
         soup.title.extract()
@@ -261,7 +263,6 @@ for article in filenames_linking_categories:
         # Поиск картинки для Featured Image
         featured_image = post_title.split(": ")[0]
         featured_image_data = image_search(featured_image, "Yes")
-
 
         # Вставка картинок
 
@@ -290,17 +291,19 @@ for article in filenames_linking_categories:
 
         post_body = "\n".join(html_new)
 
+
         # Вставка видео
 
-        html_new = []
-        for line in post_body.split("\n"):
-            if line.lower() == "<h3>" + all_h3[-1].lower() + "</h3>":
-                html_new.append(line)
-                html_new.append('<div class="mycontainer"><iframe src="//www.youtube.com/embed/' + re.sub('.*\?v=', '', youtube_url) + '" frameborder="0" allowfullscreen class="myvideo"></iframe></div>')
-            else:
-                html_new.append(line)
+        if youtube_url != None:
+            html_new = []
+            for line in post_body.split("\n"):
+                if line.lower() == "<h3>" + all_h3[-1].lower() + "</h3>":
+                    html_new.append(line)
+                    html_new.append('<div class="mycontainer"><iframe src="//www.youtube.com/embed/' + re.sub('.*\?v=', '', youtube_url) + '" frameborder="0" allowfullscreen class="myvideo"></iframe></div>')
+                else:
+                    html_new.append(line)
 
-        post_body = "\n".join(html_new)
+            post_body = "\n".join(html_new)
 
         if publish_period == 'future':
             post = {'title': post_title,
