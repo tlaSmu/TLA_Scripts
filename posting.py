@@ -30,7 +30,6 @@ worksheet = sh.worksheet("credits")
 all_sites_data = worksheet.get_all_values()
 
 
-
 for i in range(0, len(all_sites_data)):
     if all_sites_data[i][0] == domain:
         username = all_sites_data[i][2]
@@ -110,6 +109,8 @@ for article in filenames_linking_categories:
             search = GoogleSearch(params)
             results = search.get_dict()
             images_results = results["images_results"]
+
+
             all_images_urls = []
             for i in range(0, len(images_results)):
                 try:
@@ -127,7 +128,41 @@ for article in filenames_linking_categories:
 
                                 img_res = title_image_url.split(".")[len(title_image_url.split(".")) - 1]
                                 image_name = image_title.lower().replace(" ", "-")
-                                response = requests.get(title_image_url)
+                                response = requests.get(title_image_url, verify=True, timeout=5)
+
+                                if response.status_code == 200:
+                                    image_slug = f"images/{image_name}.{img_res}"
+                                    file = open(image_slug, "wb")
+                                    file.write(response.content)
+                                    file.close()
+
+                                    post_images.append(title_image_url)
+
+                                    media = {
+                                        'file': open(image_slug, 'rb'),
+                                    }
+
+                                    image = requests.post(url + '/media', headers=headers, files=media)
+
+                                    imageDATA = {'id': str(json.loads(image.content)['id']),
+                                                 'url': str(json.loads(image.content)['guid']['rendered'])}
+
+                                    return imageDATA
+                                else:
+                                    continue
+
+                            except:
+                                continue
+                        else:
+                            title_image_url = image
+                            post_images.append(title_image_url)
+
+                            img_res = title_image_url.split(".")[len(title_image_url.split(".")) - 1]
+                            image_name = image_title.lower().replace(" ", "-")
+                            response = requests.get(title_image_url, verify=True, timeout=5)
+
+                            if response.status_code == 200:
+
                                 image_slug = f"images/{image_name}.{img_res}"
                                 file = open(image_slug, "wb")
                                 file.write(response.content)
@@ -145,63 +180,43 @@ for article in filenames_linking_categories:
                                              'url': str(json.loads(image.content)['guid']['rendered'])}
 
                                 return imageDATA
-
-                            except:
+                            else:
                                 continue
-                        else:
-                            title_image_url = image
-                            post_images.append(title_image_url)
-
-                            img_res = title_image_url.split(".")[len(title_image_url.split(".")) - 1]
-                            image_name = image_title.lower().replace(" ", "-")
-                            response = requests.get(title_image_url)
-                            image_slug = f"images/{image_name}.{img_res}"
-                            file = open(image_slug, "wb")
-                            file.write(response.content)
-                            file.close()
-
-                            post_images.append(title_image_url)
-
-                            media = {
-                                'file': open(image_slug, 'rb'),
-                            }
-
-                            image = requests.post(url + '/media', headers=headers, files=media)
-
-                            imageDATA = {'id': str(json.loads(image.content)['id']),
-                                         'url': str(json.loads(image.content)['guid']['rendered'])}
-
-                            return imageDATA
                     except:
                         continue
 
             else:
                 for image in all_images_urls:
+
                     try:
                         if "ytimg.com" not in image and "wikihow.com" not in image and "tipsbulletin.com" not in image and image not in post_images and image.split(".")[len(image.split(".")) - 1] in ['jpg', 'jpeg', 'webp', 'png', 'gif', 'tiff']:
                             title_image_url = image
                             post_images.append(title_image_url)
-
                             img_res = title_image_url.split(".")[len(title_image_url.split(".")) - 1]
                             image_name = image_title.lower().replace(" ", "-")
-                            response = requests.get(title_image_url)
-                            image_slug = f"images/{image_name}.{img_res}"
-                            file = open(image_slug, "wb")
-                            file.write(response.content)
-                            file.close()
+                            response = requests.get(title_image_url, verify=True, timeout=5)
 
-                            post_images.append(title_image_url)
+                            if response.status_code == 200:
 
-                            media = {
-                                'file': open(image_slug, 'rb'),
-                            }
+                                image_slug = f"images/{image_name}.{img_res}"
+                                file = open(image_slug, "wb")
+                                file.write(response.content)
+                                file.close()
 
-                            image = requests.post(url + '/media', headers=headers, files=media)
+                                post_images.append(title_image_url)
 
-                            imageDATA = {'id': str(json.loads(image.content)['id']),
-                                         'url': str(json.loads(image.content)['guid']['rendered'])}
+                                media = {
+                                    'file': open(image_slug, 'rb'),
+                                }
 
-                            return imageDATA
+                                image = requests.post(url + '/media', headers=headers, files=media)
+
+                                imageDATA = {'id': str(json.loads(image.content)['id']),
+                                             'url': str(json.loads(image.content)['guid']['rendered'])}
+
+                                return imageDATA
+                            else:
+                                continue
                         else:
                             continue
                     except:
