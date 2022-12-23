@@ -17,6 +17,7 @@ filename_with_posts_data = "to_posting_example.csv"  # файл с данным�
 path_with_generated_files = "glue_new_html_files_layout/"  # папка с сгенерированными статьями
 serpapi_key = "xxxxxxxxxxxxxxxxxxxx"  # ключ serpapi
 publish_period = 'future'  # когда публиковать: 'future' - в будущем, 'publish' - сразу
+#### !!! В папке, откуда запускается скрипт, должна быть создана папка "images"
 
 #########################################
 
